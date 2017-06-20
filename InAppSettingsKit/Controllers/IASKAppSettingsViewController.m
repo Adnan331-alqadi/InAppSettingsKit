@@ -201,9 +201,10 @@ CGRect IASKCGRectSwap(CGRect rect);
 	}
 	
 	if (_showDoneButton) {
-		UIBarButtonItem *buttonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemDone 
-																					target:self 
-																					action:@selector(dismiss:)];
+		UIBarButtonItem *buttonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", @"Title of the button that dismisses the settings menu")
+																	   style:UIBarButtonItemStyleDone
+																	  target:self
+																	  action:@selector(dismiss:)];
 		self.navigationItem.rightBarButtonItem = buttonItem;
 	} 
 	if (!self.title) {

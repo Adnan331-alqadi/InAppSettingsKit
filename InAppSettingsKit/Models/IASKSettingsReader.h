@@ -121,7 +121,7 @@
 #define kIASKLabelFontSize                    17
 #define kIASKgrayBlueColor                    [UIColor colorWithRed:0.318f green:0.4f blue:0.569f alpha:1.f]
 
-#define kIASKMinimumFontSize                  12.0f
+#define kIASKMinimumFontSize                  6.0f
 
 #ifndef kCFCoreFoundationVersionNumber_iOS_7_0
 #define kCFCoreFoundationVersionNumber_iOS_7_0 843.00
