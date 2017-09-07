@@ -29,14 +29,14 @@
     self = [super init];
     if (self) {
         _applicationBundle = bundle;
-        
+
         NSString* plistFilePath = [self locateSettingsFile: fileName];
         _settingsDictionary = [NSDictionary dictionaryWithContentsOfFile:plistFilePath];
-        
+
         //store the bundle which we'll need later for getting localizations
         NSString* settingsBundlePath = [plistFilePath stringByDeletingLastPathComponent];
         _settingsBundle = [NSBundle bundleWithPath:settingsBundlePath];
-        
+
         // Look for localization file
         self.localizationTable = [_settingsDictionary objectForKey:@"StringsTable"];
         if (!self.localizationTable)
@@ -51,7 +51,7 @@
                 self.localizationTable = @"Root";
             }
         }
-		
+
 		self.showPrivacySettings = NO;
 		IASK_IF_IOS8_OR_GREATER
 		(
@@ -84,7 +84,7 @@
 - (void)setHiddenKeys:(NSSet *)anHiddenKeys {
     if (_hiddenKeys != anHiddenKeys) {
         _hiddenKeys = anHiddenKeys;
-        
+
         if (self.settingsDictionary) {
             [self _reinterpretBundle:self.settingsDictionary];
         }
@@ -108,7 +108,7 @@
 	if (subtitle.length) {
 		dict [kIASKSubtitle] = subtitle;
 	}
-	
+
 	return @[@[[[IASKSpecifier alloc] initWithSpecifier:@{kIASKKey: @"IASKPrivacySettingsHeaderKey", kIASKType: kIASKPSGroupSpecifier}],
 			   [[IASKSpecifier alloc] initWithSpecifier:dict]]];
 }
@@ -116,20 +116,20 @@
 - (NSBundle*)getBundle {
 	NSURL *inAppSettingsBundlePath = [[NSBundle bundleForClass:[self class]] URLForResource:@"InAppSettingsKit" withExtension:@"bundle"];
 	NSBundle *bundle;
-	
+
 	if (inAppSettingsBundlePath) {
 		bundle = [NSBundle bundleWithURL:inAppSettingsBundlePath];
 	} else {
 		bundle = [NSBundle mainBundle];
 	}
-	
+
 	return bundle;
 }
 
 - (void)_reinterpretBundle:(NSDictionary*)settingsBundle {
     NSArray *preferenceSpecifiers	= [settingsBundle objectForKey:kIASKPreferenceSpecifiers];
     NSMutableArray *dataSource		= [NSMutableArray array];
-	
+
 	if (self.showPrivacySettings) {
 		IASK_IF_IOS8_OR_GREATER
 		(
@@ -167,7 +167,7 @@
             if (dataSource.count == 0 || (dataSource.count == 1 && self.showPrivacySettings)) {
                 [dataSource addObject:[NSMutableArray array]];
             }
-            
+
             if ([newSpecifier.userInterfaceIdioms containsObject:@(UI_USER_INTERFACE_IDIOM())]) {
                 [(NSMutableArray*)dataSource.lastObject addObject:newSpecifier];
             }
@@ -201,7 +201,7 @@
 
 - (IASKSpecifier*)specifierForIndexPath:(NSIndexPath*)indexPath {
     int headingCorrection = [self _sectionHasHeading:indexPath.section] ? 1 : 0;
-    
+
     IASKSpecifier *specifier = [[[self dataSource] objectAtIndex:indexPath.section] objectAtIndex:(indexPath.row+headingCorrection)];
     specifier.settingsReader = self;
     return specifier;
@@ -235,7 +235,7 @@
 }
 
 - (NSString*)titleForSection:(NSInteger)section {
-    return [self titleForId:[self headerSpecifierForSection:section].title];
+    return [self titleForId:[self headerSpecifierForSection:section].title fromBundleTable:[self headerSpecifierForSection:section].bundleTable];
 }
 
 - (NSString*)keyForSection:(NSInteger)section {
@@ -243,10 +243,10 @@
 }
 
 - (NSString*)footerTextForSection:(NSInteger)section {
-    return [self titleForId:[self headerSpecifierForSection:section].footerText];
+    return [self titleForId:[self headerSpecifierForSection:section].footerText fromBundleTable:[self headerSpecifierForSection:section].bundleTable];
 }
 
-- (NSString*)titleForId:(NSObject*)titleId
+- (NSString*)titleForId:(NSObject*)titleId fromBundleTable:(NSString*)bundleTable
 {
 	if([titleId isKindOfClass:[NSNumber class]]) {
 		NSNumber* numberTitleId = (NSNumber*)titleId;
@@ -257,7 +257,44 @@
 	else
 	{
 		NSString* stringTitleId = (NSString*)titleId;
-		return [self.settingsBundle localizedStringForKey:stringTitleId value:stringTitleId table:self.localizationTable];
+
+        NSBundle* bundle = self.settingsBundle;
+        NSString* stringTable = self.localizationTable;
+
+        if (bundleTable != nil) {
+            // bundleTable is of the form "bundlename:stringtablename".
+            // If there is no colon, then "bundlename" is assumed.
+            // If there is nothing after the colon, then "bundlename:" is assumed.
+            // If there is nothing before the colon, then ":stringtable" is assumed, and the default bundle is used.
+            NSArray *bundleTableStrings = [bundleTable componentsSeparatedByString:@":"];
+
+            NSString *bundleName = nil, *tableName = nil;
+
+            if ([bundleTableStrings count] == 1) {
+                bundleName = bundleTableStrings[0];
+            }
+            else if ([bundleTableStrings count] == 2) {
+                bundleName = bundleTableStrings[0];
+                tableName = bundleTableStrings[1];
+            }
+
+            if ([bundleName length] > 0) {
+                // TODO: Cache bundles
+                NSString *bundlePath = [[NSBundle mainBundle] pathForResource:bundleName ofType:@"bundle"];
+                if (bundlePath != nil) {
+                    NSBundle* bundleToUse = [NSBundle bundleWithPath:bundlePath];
+                    if (bundleToUse != nil) {
+                        bundle = bundleToUse;
+                    }
+                }
+            }
+
+            if ([tableName length] > 0) {
+                stringTable = tableName;
+            }
+        }
+
+        return [bundle localizedStringForKey:stringTitleId value:stringTitleId table:stringTable];
 	}
 }
 
@@ -277,7 +314,7 @@
         withBundle:(NSString *)bundle
             suffix:(NSString *)suffix
          extension:(NSString *)extension {
-    
+
 	bundle = [self.applicationBundle pathForResource:bundle ofType:nil];
     file = [file stringByAppendingFormat:@"%@%@", suffix, extension];
     return [bundle stringByAppendingPathComponent:file];
@@ -286,7 +323,7 @@
 - (NSString *)locateSettingsFile: (NSString *)file {
     static NSString* const kIASKBundleFolder = @"Settings.bundle";
     static NSString* const kIASKBundleFolderAlt = @"InAppSettings.bundle";
-    
+
     static NSString* const kIASKBundleLocaleFolderExtension = @".lproj";
 
     // The file is searched in the following order:
@@ -310,22 +347,22 @@
     //	 of universal apps anyway.
     // - This implementation uses the device suffixes on iOS 3.x as well.
     // - also check current locale (short only)
-    
+
     NSArray *settingsBundleNames = @[kIASKBundleFolderAlt, kIASKBundleFolder];
-    
+
     NSArray *extensions = @[@".inApp.plist", @".plist"];
-    
+
     NSArray *plattformSuffixes = @[[self platformSuffixForInterfaceIdiom:UI_USER_INTERFACE_IDIOM()],
                                    @""];
-    
+
     NSArray *preferredLanguages = [NSLocale preferredLanguages];
     NSArray *languageFolders = @[[ (preferredLanguages.count ? [preferredLanguages objectAtIndex:0] : @"en") stringByAppendingString:kIASKBundleLocaleFolderExtension],
                                  @""];
 
-    
+
     NSString *path = nil;
     NSFileManager *fileManager = [NSFileManager defaultManager];
-    
+
     for (NSString *settingsBundleName in settingsBundleNames) {
         for (NSString *extension in extensions) {
             for (NSString *platformSuffix in plattformSuffixes) {
@@ -341,7 +378,7 @@
             }
         }
     }
-    
+
 exitFromNestedLoop:
     return path;
 }

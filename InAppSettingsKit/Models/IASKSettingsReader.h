@@ -6,9 +6,9 @@
 //  Luc Vandal, Edovia Inc., http://www.edovia.com
 //  Ortwin Gentz, FutureTap GmbH, http://www.futuretap.com
 //  All rights reserved.
-// 
-//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz, 
-//  as the original authors of this code. You can give credit in a blog post, a tweet or on 
+//
+//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz,
+//  as the original authors of this code. You can give credit in a blog post, a tweet or on
 //  a info page of your app. Also, the original authors appreciate letting them know if you use this code.
 //
 //  This code is licensed under the BSD license that is available at: http://www.opensource.org/licenses/bsd-license.php
@@ -20,6 +20,7 @@
 #define kIASKPreferenceSpecifiers             @"PreferenceSpecifiers"
 #define kIASKCellImage                        @"IASKCellImage"
 
+#define kIASKBundleTable                      @"BundleTable"
 #define kIASKType                             @"Type"
 #define kIASKTitle                            @"Title"
 #define kIASKFooterText                       @"FooterText"
@@ -215,7 +216,7 @@ __VA_ARGS__ \
  searches for a settings bundle that contains
  a plist with the specified fileName that must
  be contained in the given bundle
- 
+
  calls initWithFile where applicationBundle is
  set to [NSBundle mainBundle]
  */
@@ -233,7 +234,7 @@ __VA_ARGS__ \
 - (NSString*)titleForSection:(NSInteger)section;
 - (NSString*)keyForSection:(NSInteger)section;
 - (NSString*)footerTextForSection:(NSInteger)section;
-- (NSString*)titleForId:(NSObject*)titleId;
+- (NSString*)titleForId:(NSObject*)titleId fromBundleTable:(NSString*)bundleTable;
 - (NSString*)pathForImageNamed:(NSString*)image;
 
 ///the main application bundle. most often [NSBundle mainBundle]

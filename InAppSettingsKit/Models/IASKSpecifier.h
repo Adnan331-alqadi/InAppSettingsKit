@@ -32,7 +32,8 @@
 - (void)sortIfNeeded;
 
 - (NSString*)localizedObjectForKey:(NSString*)key;
-- (NSString*)title;
+- (NSString *)bundleTable;
+- (NSString *)title;
 - (NSString*)subtitle;
 - (NSString*)placeholder;
 - (NSString*)key;
