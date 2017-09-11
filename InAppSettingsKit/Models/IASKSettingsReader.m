@@ -281,6 +281,13 @@
             if ([bundleName length] > 0) {
                 // TODO: Cache bundles
                 NSString *bundlePath = [[NSBundle mainBundle] pathForResource:bundleName ofType:@"bundle"];
+
+                if (bundlePath == nil) {
+                    // HACK: In the Example app, the PsiphonClientCommonLibrary is sometimes seemingly not findable when the app starts via pathForResource. So we'll also try to get it via bundleForIdentifier.
+                    NSString *bundleIdentifier = [NSString stringWithFormat:@"org.cocoapods.%@", bundleName];
+                    bundlePath = [[NSBundle bundleWithIdentifier:bundleIdentifier] pathForResource:bundleName ofType:@"bundle"];
+                }
+
                 if (bundlePath != nil) {
                     NSBundle* bundleToUse = [NSBundle bundleWithPath:bundlePath];
                     if (bundleToUse != nil) {
