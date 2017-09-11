@@ -6,9 +6,9 @@
 //  Luc Vandal, Edovia Inc., http://www.edovia.com
 //  Ortwin Gentz, FutureTap GmbH, http://www.futuretap.com
 //  All rights reserved.
-// 
-//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz, 
-//  as the original authors of this code. You can give credit in a blog post, a tweet or on 
+//
+//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz,
+//  as the original authors of this code. You can give credit in a blog post, a tweet or on
 //  a info page of your app. Also, the original authors appreciate letting them know if you use this code.
 //
 //  This code is licensed under the BSD license that is available at: http://www.opensource.org/licenses/bsd-license.php
@@ -60,19 +60,19 @@
     NSArray *titles = [_specifierDict objectForKey:kIASKTitles];
     NSArray *shortTitles = [_specifierDict objectForKey:kIASKShortTitles];
     NSMutableDictionary *multipleValuesDict = [NSMutableDictionary new];
-    
+
     if (values) {
 		[multipleValuesDict setObject:values forKey:kIASKValues];
 	}
-	
+
     if (titles) {
 		[multipleValuesDict setObject:titles forKey:kIASKTitles];
 	}
-    
+
     if (shortTitles.count) {
 		[multipleValuesDict setObject:shortTitles forKey:kIASKShortTitles];
 	}
-    
+
     [self setMultipleValuesDict:multipleValuesDict];
 }
 
@@ -95,14 +95,15 @@
         static NSString *const valueKey = @"value";
         IASKSettingsReader *strongSettingsReader = self.settingsReader;
         [titles enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            NSString *localizedTitle = [strongSettingsReader titleForId:obj];
+            // TODO: support BundleTable
+            NSString *localizedTitle = [strongSettingsReader titleForId:obj fromBundleTable:nil];
             [temporaryMappingsForSort addObject:@{titleKey : obj,
                                                   valueKey : values[idx],
                                                   localizedTitleKey : localizedTitle,
                                                   shortTitleKey : (shortTitles[idx] ?: [NSNull null]),
                                                   }];
         }];
-        
+
         NSArray *sortedTemporaryMappings = [temporaryMappingsForSort sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             NSString *localizedTitle1 = obj1[localizedTitleKey];
             NSString *localizedTitle2 = obj2[localizedTitleKey];
@@ -113,7 +114,7 @@
                 return NSOrderedSame;
             }
         }];
-        
+
         NSMutableArray *sortedTitles = [NSMutableArray arrayWithCapacity:sortedTemporaryMappings.count];
         NSMutableArray *sortedShortTitles = [NSMutableArray arrayWithCapacity:sortedTemporaryMappings.count];
         NSMutableArray *sortedValues = [NSMutableArray arrayWithCapacity:sortedTemporaryMappings.count];
@@ -129,19 +130,19 @@
         titles = [sortedTitles copy];
         values = [sortedValues copy];
         shortTitles = [sortedShortTitles copy];
-        
+
         if (values) {
             [multipleValuesDict setObject:values forKey:kIASKValues];
         }
-        
+
         if (titles) {
             [multipleValuesDict setObject:titles forKey:kIASKTitles];
         }
-        
+
         if (shortTitles.count) {
             [multipleValuesDict setObject:shortTitles forKey:kIASKShortTitles];
         }
-        
+
         [self setMultipleValuesDict:multipleValuesDict];
     }
 }
@@ -152,7 +153,13 @@
 
 - (NSString*)localizedObjectForKey:(NSString*)key {
 	IASKSettingsReader *settingsReader = self.settingsReader;
-	return [settingsReader titleForId:[_specifierDict objectForKey:key]];
+	return [settingsReader titleForId:[_specifierDict objectForKey:key] fromBundleTable:self.bundleTable];
+}
+
+- (NSString*)bundleTable {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKBundleTable];
+    return res;
 }
 
 - (NSString*)title {
@@ -235,7 +242,8 @@
 	}
 	@try {
 		IASKSettingsReader *strongSettingsReader = self.settingsReader;
-		return [strongSettingsReader titleForId:[titles objectAtIndex:keyIndex]];
+        // TODO: support BundleTable
+		return [strongSettingsReader titleForId:[titles objectAtIndex:keyIndex] fromBundleTable:nil];
 	}
 	@catch (NSException * e) {}
 	return nil;
@@ -373,7 +381,7 @@
     NSString *imageName = [_specifierDict objectForKey:kIASKCellImage];
     if( imageName.length == 0 )
         return nil;
-    
+
     return [UIImage imageNamed:imageName];
 }
 

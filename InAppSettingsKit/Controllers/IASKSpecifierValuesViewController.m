@@ -6,9 +6,9 @@
 //  Luc Vandal, Edovia Inc., http://www.edovia.com
 //  Ortwin Gentz, FutureTap GmbH, http://www.futuretap.com
 //  All rights reserved.
-// 
-//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz, 
-//  as the original authors of this code. You can give credit in a blog post, a tweet or on 
+//
+//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz,
+//  as the original authors of this code. You can give credit in a blog post, a tweet or on
 //  a info page of your app. Also, the original authors appreciate letting them know if you use this code.
 //
 //  This code is licensed under the BSD license that is available at: http://www.opensource.org/licenses/bsd-license.php
@@ -46,7 +46,7 @@
     UIViewAutoresizingFlexibleHeight;
     _tableView.delegate = self;
     _tableView.dataSource = self;
-    
+
     self.view = _tableView;
 
     _selection = [IASKMultipleValueSelection new];
@@ -59,7 +59,7 @@
         [self setTitle:[_currentSpecifier title]];
         _selection.specifier = _currentSpecifier;
     }
-    
+
     if (_tableView) {
         [_tableView reloadData];
 		_selection.tableView = _tableView;
@@ -94,7 +94,7 @@
 - (void)didReceiveMemoryWarning {
 	// Releases the view if it doesn't have a superview.
     [super didReceiveMemoryWarning];
-	
+
 	// Release any cached data, images, etc that aren't in use.
 }
 
@@ -116,7 +116,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell   = [tableView dequeueReusableCellWithIdentifier:kCellValue];
     NSArray *titles         = [_currentSpecifier multipleTitles];
-	
+
     if (!cell) {
         cell = [[UITableViewCell alloc] initWithStyle:UITableViewCellStyleDefault reuseIdentifier:kCellValue];
     }
@@ -124,7 +124,8 @@
     [_selection updateSelectionInCell:cell indexPath:indexPath];
 
     @try {
-		[[cell textLabel] setText:[self.settingsReader titleForId:[titles objectAtIndex:indexPath.row]]];
+        // TODO: support BundleTable
+		[[cell textLabel] setText:[self.settingsReader titleForId:[titles objectAtIndex:indexPath.row] fromBundleTable:nil]];
 	}
 	@catch (NSException * e) {}
     return cell;
