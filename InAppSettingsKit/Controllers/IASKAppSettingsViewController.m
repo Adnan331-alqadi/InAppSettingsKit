@@ -201,14 +201,14 @@ CGRect IASKCGRectSwap(CGRect rect);
 	}
 
 	if (_showDoneButton) {
-		UIBarButtonItem *buttonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedString(@"Done", @"Title of the button that dismisses the settings menu")
+		UIBarButtonItem *buttonItem = [[UIBarButtonItem alloc] initWithTitle:NSLocalizedStringWithDefaultValue(@"DONE_ACTION", nil, [NSBundle mainBundle], @"Done", @"Title of the button that dismisses the settings menu (InAppSettingsKit)")
 																	   style:UIBarButtonItemStyleDone
 																	  target:self
 																	  action:@selector(dismiss:)];
 		self.navigationItem.rightBarButtonItem = buttonItem;
 	}
 	if (!self.title) {
-		self.title = NSLocalizedString(@"Settings", @"");
+		self.title = NSLocalizedStringWithDefaultValue(@"SETTINGS_TITLE", nil, [NSBundle mainBundle],@"Settings", @"Title of the settings (aka preferences) view (InAppSettingsKit)");
 	}
 
 	if ([self.settingsStore isKindOfClass:[IASKSettingsStoreUserDefaults class]]) {
@@ -871,19 +871,19 @@ CGRect IASKCGRectSwap(CGRect rect);
 			IASK_IF_PRE_IOS8
 			(
             UIAlertView *alert = [[UIAlertView alloc]
-                                  initWithTitle:NSLocalizedString(@"Mail not configured", @"InAppSettingsKit")
-                                  message:NSLocalizedString(@"This device is not configured for sending Email. Please configure the Mail settings in the Settings app.", @"InAppSettingsKit")
+                                  initWithTitle:NSLocalizedStringWithDefaultValue(@"MAIL_NOT_CONFIGURED", nil, [NSBundle mainBundle], @"Mail not configured", @"Shown when the device is not configured for sending email. (InAppSettingsKit)")
+                                  message:NSLocalizedStringWithDefaultValue(@"MAIL_NOT_CONFIGURED_DESC", nil, [NSBundle mainBundle], @"This device is not configured for sending Email. Please configure the Mail settings in the Settings app.", @"Description for the 'Mail not configured' message. (InAppSettingsKit)")
                                   delegate: nil
-                                  cancelButtonTitle:NSLocalizedString(@"OK", @"InAppSettingsKit")
+                                  cancelButtonTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button. (InAppSettingsKit)")
                                   otherButtonTitles:nil];
             [alert show];
 			 )
 			IASK_IF_IOS8_OR_GREATER
 			(
-			 UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedString(@"Mail not configured", @"InAppSettingsKit")
-																			message:NSLocalizedString(@"This device is not configured for sending Email. Please configure the Mail settings in the Settings app.", @"InAppSettingsKit")
+			 UIAlertController *alert = [UIAlertController alertControllerWithTitle:NSLocalizedStringWithDefaultValue(@"MAIL_NOT_CONFIGURED", nil, [NSBundle mainBundle], @"Mail not configured", @"Shown when the device is not configured for sending email. (InAppSettingsKit)")
+																			message:NSLocalizedStringWithDefaultValue(@"MAIL_NOT_CONFIGURED_DESC", nil, [NSBundle mainBundle], @"This device is not configured for sending Email. Please configure the Mail settings in the Settings app.", @"Description for the 'Mail not configured' message. (InAppSettingsKit)")
 																	 preferredStyle:UIAlertControllerStyleAlert];
-			 [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"InAppSettingsKit") style:UIAlertActionStyleCancel handler:^(UIAlertAction * action) {}]];
+			 [alert addAction:[UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button. (InAppSettingsKit)") style:UIAlertActionStyleCancel handler:^(UIAlertAction * action) {}]];
 			 [self presentViewController:alert animated:YES completion:nil];
 			)
         }
