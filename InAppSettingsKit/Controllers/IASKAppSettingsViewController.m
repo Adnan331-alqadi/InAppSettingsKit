@@ -70,7 +70,7 @@ CGRect IASKCGRectSwap(CGRect rect);
 #pragma mark accessors
 - (IASKSettingsReader*)settingsReader {
 	if (!_settingsReader) {
-		_settingsReader = [[IASKSettingsReader alloc] initWithFile:self.file];
+		_settingsReader = [[IASKSettingsReader alloc] initWithFile:self.file fromBundle:self.bundle];
 		if (self.neverShowPrivacySettings) {
 			_settingsReader.showPrivacySettings = NO;
 		}
@@ -778,6 +778,15 @@ CGRect IASKCGRectSwap(CGRect rect);
         targetViewController.showCreditsFooter = NO; // Does not reload the tableview (but next setters do it)
         targetViewController.delegate = self.delegate;
         targetViewController.settingsStore = self.settingsStore;
+
+        // HACK: For right now we are only using bundle name in BundleTable, and
+        // the bundle for the string lookup is the same bundle where the child
+        // plist can be found, so we're going to overload BundleTable to do the
+        // child plist lookup. There might come a day where this is no longer good
+        // enough and we'll have to introduce new, separate attributes, properties, etc.
+        // TODO: Make this not a hack.
+        targetViewController.bundle = [IASKSettingsReader bundleFromName:specifier.bundleTable];
+
         targetViewController.file = specifier.file;
         targetViewController.hiddenKeys = self.hiddenKeys;
         targetViewController.title = specifier.title;
