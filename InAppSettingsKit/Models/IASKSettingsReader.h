@@ -223,7 +223,7 @@ __VA_ARGS__ \
 - (id) initWithSettingsFileNamed:(NSString*) fileName
                applicationBundle:(NSBundle*) bundle;
 
-- (id) initWithFile:(NSString*)file;
+- (id) initWithFile:(NSString*)file fromBundle:(NSBundle*)bundle;
 
 - (NSInteger)numberOfSections;
 - (NSInteger)numberOfRowsForSection:(NSInteger)section;
@@ -236,6 +236,8 @@ __VA_ARGS__ \
 - (NSString*)footerTextForSection:(NSInteger)section;
 - (NSString*)titleForId:(NSObject*)titleId fromBundleTable:(NSString*)bundleTable;
 - (NSString*)pathForImageNamed:(NSString*)image;
+
++ (NSBundle*)bundleFromName:(NSString*)bundleName;
 
 ///the main application bundle. most often [NSBundle mainBundle]
 @property (nonatomic, readonly) NSBundle      *applicationBundle;

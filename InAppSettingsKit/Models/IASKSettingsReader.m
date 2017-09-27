@@ -73,12 +73,15 @@
     return self;
 }
 
-- (id)initWithFile:(NSString*)file {
-    return [self initWithSettingsFileNamed:file applicationBundle:[NSBundle mainBundle]];
+- (id)initWithFile:(NSString*)file fromBundle:(NSBundle*)bundle {
+    if (bundle == nil) {
+        bundle = [NSBundle mainBundle];
+    }
+    return [self initWithSettingsFileNamed:file applicationBundle:bundle];
 }
 
 - (id)init {
-    return [self initWithFile:@"Root"];
+    return [self initWithFile:@"Root" fromBundle:nil];
 }
 
 - (void)setHiddenKeys:(NSSet *)anHiddenKeys {
@@ -280,19 +283,9 @@
 
             if ([bundleName length] > 0) {
                 // TODO: Cache bundles
-                NSString *bundlePath = [[NSBundle mainBundle] pathForResource:bundleName ofType:@"bundle"];
-
-                if (bundlePath == nil) {
-                    // HACK: In the Example app, the PsiphonClientCommonLibrary is sometimes seemingly not findable when the app starts via pathForResource. So we'll also try to get it via bundleForIdentifier.
-                    NSString *bundleIdentifier = [NSString stringWithFormat:@"org.cocoapods.%@", bundleName];
-                    bundlePath = [[NSBundle bundleWithIdentifier:bundleIdentifier] pathForResource:bundleName ofType:@"bundle"];
-                }
-
-                if (bundlePath != nil) {
-                    NSBundle* bundleToUse = [NSBundle bundleWithPath:bundlePath];
-                    if (bundleToUse != nil) {
-                        bundle = bundleToUse;
-                    }
+                NSBundle *bundleToUse = [IASKSettingsReader bundleFromName:bundleName];
+                if (bundleToUse != nil) {
+                    bundle = bundleToUse;
                 }
             }
 
@@ -307,6 +300,31 @@
 
 - (NSString*)pathForImageNamed:(NSString*)image {
     return [[self.settingsBundle bundlePath] stringByAppendingPathComponent:image];
+}
+
++ (NSBundle*)bundleFromName:(NSString*)bundleName {
+    if (bundleName == nil || [bundleName length] == 0) {
+        return nil;
+    }
+
+    NSBundle *bundle = nil;
+
+    NSString *bundlePath = [[NSBundle mainBundle] pathForResource:bundleName ofType:@"bundle"];
+
+    if (bundlePath == nil) {
+        // HACK: In the Example app, the PsiphonClientCommonLibrary is sometimes seemingly not findable when the app starts via pathForResource. So we'll also try to get it via bundleForIdentifier.
+        NSString *bundleIdentifier = [NSString stringWithFormat:@"org.cocoapods.%@", bundleName];
+        bundlePath = [[NSBundle bundleWithIdentifier:bundleIdentifier] pathForResource:bundleName ofType:@"bundle"];
+    }
+
+    if (bundlePath != nil) {
+        NSBundle* bundleToUse = [NSBundle bundleWithPath:bundlePath];
+        if (bundleToUse != nil) {
+            bundle = bundleToUse;
+        }
+    }
+
+    return bundle;
 }
 
 - (NSString *)platformSuffixForInterfaceIdiom:(UIUserInterfaceIdiom) interfaceIdiom {
