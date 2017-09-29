@@ -23,7 +23,9 @@
 #define kIASKBundleTable                      @"BundleTable"
 #define kIASKType                             @"Type"
 #define kIASKTitle                            @"Title"
+#define kIASKTitleDefault                     @"TitleDefault"
 #define kIASKFooterText                       @"FooterText"
+#define kIASKFooterTextDefault                @"FooterTextDefault"
 #define kIASKKey                              @"Key"
 #define kIASKFile                             @"File"
 #define kIASKDefaultValue                     @"DefaultValue"
@@ -41,7 +43,9 @@
 #define kIASKShortTitles                      @"ShortTitles"
 #define kIASKSupportedUserInterfaceIdioms     @"SupportedUserInterfaceIdioms"
 #define kIASKSubtitle                         @"IASKSubtitle"
+#define kIASKSubtitleDefault                  @"IASKSubtitleDefault"
 #define kIASKPlaceholder                      @"IASKPlaceholder"
+#define kIASKPlaceholderDefault               @"IASKPlaceholderDefault"
 #define kIASKViewControllerClass              @"IASKViewControllerClass"
 #define kIASKViewControllerSelector           @"IASKViewControllerSelector"
 #define kIASKViewControllerStoryBoardFile     @"IASKViewControllerStoryBoardFile"
@@ -234,7 +238,7 @@ __VA_ARGS__ \
 - (NSString*)titleForSection:(NSInteger)section;
 - (NSString*)keyForSection:(NSInteger)section;
 - (NSString*)footerTextForSection:(NSInteger)section;
-- (NSString*)titleForId:(NSObject*)titleId fromBundleTable:(NSString*)bundleTable;
+- (NSString*)titleForId:(NSObject*)titleId withDefaultValue:(NSString*)titleValue fromBundleTable:(NSString*)bundleTable;
 - (NSString*)pathForImageNamed:(NSString*)image;
 
 + (NSBundle*)bundleFromName:(NSString*)bundleName;

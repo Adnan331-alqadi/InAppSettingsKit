@@ -238,7 +238,7 @@
 }
 
 - (NSString*)titleForSection:(NSInteger)section {
-    return [self titleForId:[self headerSpecifierForSection:section].title fromBundleTable:[self headerSpecifierForSection:section].bundleTable];
+    return [self titleForId:[self headerSpecifierForSection:section].title withDefaultValue:[self headerSpecifierForSection:section].titleDefault fromBundleTable:[self headerSpecifierForSection:section].bundleTable];
 }
 
 - (NSString*)keyForSection:(NSInteger)section {
@@ -246,10 +246,10 @@
 }
 
 - (NSString*)footerTextForSection:(NSInteger)section {
-    return [self titleForId:[self headerSpecifierForSection:section].footerText fromBundleTable:[self headerSpecifierForSection:section].bundleTable];
+    return [self titleForId:[self headerSpecifierForSection:section].footerText withDefaultValue:[self headerSpecifierForSection:section].footerTextDefault fromBundleTable:[self headerSpecifierForSection:section].bundleTable];
 }
 
-- (NSString*)titleForId:(NSObject*)titleId fromBundleTable:(NSString*)bundleTable
+- (NSString*)titleForId:(NSObject*)titleId withDefaultValue:(NSString*)titleValue fromBundleTable:(NSString*)bundleTable
 {
 	if([titleId isKindOfClass:[NSNumber class]]) {
 		NSNumber* numberTitleId = (NSNumber*)titleId;
@@ -260,6 +260,12 @@
 	else
 	{
 		NSString* stringTitleId = (NSString*)titleId;
+
+        if (!titleValue) {
+            // Not all plist entries will have a default value. In particular,
+            // items that are not intended to be translated.
+            titleValue = stringTitleId;
+        }
 
         NSBundle* bundle = self.settingsBundle;
         NSString* stringTable = self.localizationTable;
@@ -294,7 +300,7 @@
             }
         }
 
-        return [bundle localizedStringForKey:stringTitleId value:stringTitleId table:stringTable];
+        return [bundle localizedStringForKey:stringTitleId value:titleValue table:stringTable];
 	}
 }
 

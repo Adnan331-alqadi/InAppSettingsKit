@@ -125,7 +125,7 @@
 
     @try {
         // TODO: support BundleTable
-		[[cell textLabel] setText:[self.settingsReader titleForId:[titles objectAtIndex:indexPath.row] fromBundleTable:nil]];
+        [[cell textLabel] setText:[self.settingsReader titleForId:[titles objectAtIndex:indexPath.row] withDefaultValue:nil fromBundleTable:nil]];
 	}
 	@catch (NSException * e) {}
     return cell;
