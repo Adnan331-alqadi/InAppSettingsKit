@@ -124,8 +124,18 @@
     [_selection updateSelectionInCell:cell indexPath:indexPath];
 
     @try {
-        // TODO: support BundleTable
-		[[cell textLabel] setText:[self.settingsReader titleForId:[titles objectAtIndex:indexPath.row] fromBundleTable:nil]];
+        NSString *titleId = nil, *titleDefault = nil, *bundleTable = nil;
+
+        if ([[titles objectAtIndex:indexPath.row] isKindOfClass:[NSString class]]) {
+            titleId = [titles objectAtIndex:indexPath.row];
+        }
+        else {
+            titleId = [[titles objectAtIndex:indexPath.row] valueForKey:kIASKTitle];
+            titleDefault = [[titles objectAtIndex:indexPath.row] valueForKey:kIASKTitleDefault];
+            bundleTable = [[titles objectAtIndex:indexPath.row] valueForKey:kIASKBundleTable];
+        }
+
+        [[cell textLabel] setText:[self.settingsReader titleForId:titleId withDefaultValue:titleDefault fromBundleTable:bundleTable]];
 	}
 	@catch (NSException * e) {}
     return cell;

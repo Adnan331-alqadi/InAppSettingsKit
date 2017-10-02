@@ -96,7 +96,7 @@
         IASKSettingsReader *strongSettingsReader = self.settingsReader;
         [titles enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
             // TODO: support BundleTable
-            NSString *localizedTitle = [strongSettingsReader titleForId:obj fromBundleTable:nil];
+            NSString *localizedTitle = [strongSettingsReader titleForId:obj withDefaultValue:nil fromBundleTable:nil];
             [temporaryMappingsForSort addObject:@{titleKey : obj,
                                                   valueKey : values[idx],
                                                   localizedTitleKey : localizedTitle,
@@ -153,7 +153,12 @@
 
 - (NSString*)localizedObjectForKey:(NSString*)key {
 	IASKSettingsReader *settingsReader = self.settingsReader;
-	return [settingsReader titleForId:[_specifierDict objectForKey:key] fromBundleTable:self.bundleTable];
+
+    // This is kind of a hack to go from something like "FooterText" to "FooterTextDefault".
+    // It will fail for some keys, but nil is okay in those cases okay.
+    NSString* defaultValueKey = [key stringByAppendingString:@"Default"];
+
+    return [settingsReader titleForId:[_specifierDict objectForKey:key] withDefaultValue:[_specifierDict objectForKey:defaultValueKey] fromBundleTable:self.bundleTable];
 }
 
 - (NSString*)bundleTable {
@@ -166,16 +171,40 @@
     return [self localizedObjectForKey:kIASKTitle];
 }
 
+- (NSString*)titleDefault {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKTitleDefault];
+    return res;
+}
+
 - (NSString*)subtitle {
 	return [self localizedObjectForKey:kIASKSubtitle];
 }
 
+- (NSString*)subtitleDefault {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKSubtitleDefault];
+    return res;
+}
+
 - (NSString *)placeholder {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKPlaceholderDefault];
+    return res;
+}
+
+- (NSString *)placeholderDefault {
     return [self localizedObjectForKey:kIASKPlaceholder];
 }
 
 - (NSString*)footerText {
     return [self localizedObjectForKey:kIASKFooterText];
+}
+
+- (NSString*)footerTextDefault {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKFooterTextDefault];
+    return res;
 }
 
 - (Class)viewControllerClass {
@@ -242,8 +271,19 @@
 	}
 	@try {
 		IASKSettingsReader *strongSettingsReader = self.settingsReader;
-        // TODO: support BundleTable
-		return [strongSettingsReader titleForId:[titles objectAtIndex:keyIndex] fromBundleTable:nil];
+
+        NSString *titleId = nil, *titleDefault = nil, *bundleTable = nil;
+
+        if ([[titles objectAtIndex:keyIndex] isKindOfClass:[NSString class]]) {
+            titleId = [titles objectAtIndex:keyIndex];
+        }
+        else {
+            titleId = [[titles objectAtIndex:keyIndex] valueForKey:kIASKTitle];
+            titleDefault = [[titles objectAtIndex:keyIndex] valueForKey:kIASKTitleDefault];
+            bundleTable = [[titles objectAtIndex:keyIndex] valueForKey:kIASKBundleTable];
+        }
+
+        return [strongSettingsReader titleForId:titleId withDefaultValue:titleDefault fromBundleTable:bundleTable];
 	}
 	@catch (NSException * e) {}
 	return nil;

@@ -653,8 +653,8 @@ CGRect IASKCGRectSwap(CGRect rect);
 		cell.accessoryType = (specifier.textAlignment == NSTextAlignmentLeft) ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
 	} else if ([specifier.type isEqualToString:kIASKButtonSpecifier]) {
 		NSString *value = [self.settingsStore objectForKey:specifier.key];
-        // TODO: support BundleTable
-		cell.textLabel.text = ([value isKindOfClass:NSString.class] && [self.settingsReader titleForId:value fromBundleTable:nil].length) ? [self.settingsReader titleForId:value fromBundleTable:nil] : specifier.title;
+		// TODO: support BundleTable
+		cell.textLabel.text = ([value isKindOfClass:NSString.class] && [self.settingsReader titleForId:value withDefaultValue:nil fromBundleTable:nil].length) ? [self.settingsReader titleForId:value withDefaultValue:nil fromBundleTable:nil] : specifier.title;
 		cell.detailTextLabel.text = specifier.subtitle;
 		IASK_IF_IOS7_OR_GREATER
 		(if (specifier.textAlignment != NSTextAlignmentLeft) {
@@ -664,8 +664,19 @@ CGRect IASKCGRectSwap(CGRect rect);
 		cell.accessoryType = (specifier.textAlignment == NSTextAlignmentLeft) ? UITableViewCellAccessoryDisclosureIndicator : UITableViewCellAccessoryNone;
 	} else if ([specifier.type isEqualToString:kIASKPSRadioGroupSpecifier]) {
 		NSInteger index = [specifier.multipleValues indexOfObject:specifier.radioGroupValue];
-        // TODO: support BundleTable
-		cell.textLabel.text = [self.settingsReader titleForId:specifier.multipleTitles[index] fromBundleTable:nil];
+
+		NSString *titleId = nil, *titleDefault = nil, *bundleTable = nil;
+
+		if ([specifier.multipleTitles[index] isKindOfClass:[NSString class]]) {
+			titleId = specifier.multipleTitles[index];
+		}
+		else {
+			titleId = [specifier.multipleTitles[index] valueForKey:kIASKTitle];
+			titleDefault = [specifier.multipleTitles[index] valueForKey:kIASKTitleDefault];
+			bundleTable = [specifier.multipleTitles[index] valueForKey:kIASKBundleTable];
+		}
+
+		cell.textLabel.text = [self.settingsReader titleForId:titleId withDefaultValue:titleDefault fromBundleTable:bundleTable];
 		[_selections[indexPath.section] updateSelectionInCell:cell indexPath:indexPath];
 	} else {
 		cell.textLabel.text = specifier.title;
@@ -680,7 +691,7 @@ CGRect IASKCGRectSwap(CGRect rect);
 	cell.detailTextLabel.textAlignment = specifier.textAlignment;
 	cell.textLabel.adjustsFontSizeToFitWidth = specifier.adjustsFontSizeToFitWidth;
 	cell.detailTextLabel.adjustsFontSizeToFitWidth = specifier.adjustsFontSizeToFitWidth;
-    return cell;
+	return cell;
 }
 
 - (NSIndexPath *)tableView:(UITableView *)tableView willSelectRowAtIndexPath:(NSIndexPath *)indexPath {
