@@ -238,7 +238,7 @@
 }
 
 - (NSString*)titleForSection:(NSInteger)section {
-    return [self titleForId:[self headerSpecifierForSection:section].title withDefaultValue:[self headerSpecifierForSection:section].titleDefault fromBundleTable:[self headerSpecifierForSection:section].bundleTable];
+    return [self headerSpecifierForSection:section].title;
 }
 
 - (NSString*)keyForSection:(NSInteger)section {
@@ -246,7 +246,7 @@
 }
 
 - (NSString*)footerTextForSection:(NSInteger)section {
-    return [self titleForId:[self headerSpecifierForSection:section].footerText withDefaultValue:[self headerSpecifierForSection:section].footerTextDefault fromBundleTable:[self headerSpecifierForSection:section].bundleTable];
+    return [self headerSpecifierForSection:section].footerText;
 }
 
 - (NSString*)titleForId:(NSObject*)titleId withDefaultValue:(NSString*)titleValue fromBundleTable:(NSString*)bundleTable
@@ -259,6 +259,10 @@
 	}
 	else
 	{
+        if (titleId == nil) {
+            return nil;
+        }
+        
 		NSString* stringTitleId = (NSString*)titleId;
 
         if (!titleValue) {
@@ -320,7 +324,11 @@
     if (bundlePath == nil) {
         // HACK: In the Example app, the PsiphonClientCommonLibrary is sometimes seemingly not findable when the app starts via pathForResource. So we'll also try to get it via bundleForIdentifier.
         NSString *bundleIdentifier = [NSString stringWithFormat:@"org.cocoapods.%@", bundleName];
-        bundlePath = [[NSBundle bundleWithIdentifier:bundleIdentifier] pathForResource:bundleName ofType:@"bundle"];
+        bundle = [NSBundle bundleWithIdentifier:bundleIdentifier];
+        bundlePath = [bundle pathForResource:bundleName ofType:@"bundle"];
+        if (bundlePath == nil) {
+            bundlePath = bundle.bundlePath;
+        }
     }
 
     if (bundlePath != nil) {

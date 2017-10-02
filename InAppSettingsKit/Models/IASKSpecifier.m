@@ -271,8 +271,19 @@
 	}
 	@try {
 		IASKSettingsReader *strongSettingsReader = self.settingsReader;
-        // TODO: support BundleTable
-        return [strongSettingsReader titleForId:[titles objectAtIndex:keyIndex] withDefaultValue:nil fromBundleTable:nil];
+
+        NSString *titleId = nil, *titleDefault = nil, *bundleTable = nil;
+
+        if ([[titles objectAtIndex:keyIndex] isKindOfClass:[NSString class]]) {
+            titleId = [titles objectAtIndex:keyIndex];
+        }
+        else {
+            titleId = [[titles objectAtIndex:keyIndex] valueForKey:kIASKTitle];
+            titleDefault = [[titles objectAtIndex:keyIndex] valueForKey:kIASKTitleDefault];
+            bundleTable = [[titles objectAtIndex:keyIndex] valueForKey:kIASKBundleTable];
+        }
+
+        return [strongSettingsReader titleForId:titleId withDefaultValue:titleDefault fromBundleTable:bundleTable];
 	}
 	@catch (NSException * e) {}
 	return nil;
