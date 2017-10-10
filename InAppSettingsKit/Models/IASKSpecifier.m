@@ -188,13 +188,13 @@
 }
 
 - (NSString *)placeholder {
-    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
-    NSString* res = [_specifierDict objectForKey:kIASKPlaceholderDefault];
-    return res;
+    return [self localizedObjectForKey:kIASKPlaceholder];
 }
 
 - (NSString *)placeholderDefault {
-    return [self localizedObjectForKey:kIASKPlaceholder];
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKPlaceholderDefault];
+    return res;
 }
 
 - (NSString*)footerText {
