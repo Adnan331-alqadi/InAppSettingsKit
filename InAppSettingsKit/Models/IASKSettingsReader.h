@@ -241,7 +241,15 @@ __VA_ARGS__ \
 - (NSString*)titleForId:(NSObject*)titleId withDefaultValue:(NSString*)titleValue fromBundleTable:(NSString*)bundleTable;
 - (NSString*)pathForImageNamed:(NSString*)image;
 
++ (void)splitBundleTable:(NSString*)bundleTable
+              intoBundle:(NSString**)bundleName
+                andTable:(NSString**)tableName;
 + (NSBundle*)bundleFromName:(NSString*)bundleName;
++ (NSString*)localizeStringForKey:(NSString*)key
+                 withDefaultValue:(NSString*)defaultValue
+                  fromBundleTable:(NSString*)bundleTable
+                    defaultBundle:(NSBundle*)defaultBundle
+                     defaultTable:(NSString*)defaultTable;
 
 ///the main application bundle. most often [NSBundle mainBundle]
 @property (nonatomic, readonly) NSBundle      *applicationBundle;

@@ -262,54 +262,40 @@
         if (titleId == nil) {
             return nil;
         }
-        
-		NSString* stringTitleId = (NSString*)titleId;
 
-        if (!titleValue) {
-            // Not all plist entries will have a default value. In particular,
-            // items that are not intended to be translated.
-            titleValue = stringTitleId;
-        }
-
-        NSBundle* bundle = self.settingsBundle;
-        NSString* stringTable = self.localizationTable;
-
-        if (bundleTable != nil) {
-            // bundleTable is of the form "bundlename:stringtablename".
-            // If there is no colon, then "bundlename" is assumed.
-            // If there is nothing after the colon, then "bundlename:" is assumed.
-            // If there is nothing before the colon, then ":stringtable" is assumed, and the default bundle is used.
-            NSArray *bundleTableStrings = [bundleTable componentsSeparatedByString:@":"];
-
-            NSString *bundleName = nil, *tableName = nil;
-
-            if ([bundleTableStrings count] == 1) {
-                bundleName = bundleTableStrings[0];
-            }
-            else if ([bundleTableStrings count] == 2) {
-                bundleName = bundleTableStrings[0];
-                tableName = bundleTableStrings[1];
-            }
-
-            if ([bundleName length] > 0) {
-                // TODO: Cache bundles
-                NSBundle *bundleToUse = [IASKSettingsReader bundleFromName:bundleName];
-                if (bundleToUse != nil) {
-                    bundle = bundleToUse;
-                }
-            }
-
-            if ([tableName length] > 0) {
-                stringTable = tableName;
-            }
-        }
-
-        return [bundle localizedStringForKey:stringTitleId value:titleValue table:stringTable];
+        return [IASKSettingsReader localizeStringForKey:(NSString*)titleId
+                                       withDefaultValue:titleValue
+                                        fromBundleTable:bundleTable
+                                          defaultBundle:self.settingsBundle
+                                           defaultTable:self.localizationTable];
 	}
 }
 
 - (NSString*)pathForImageNamed:(NSString*)image {
     return [[self.settingsBundle bundlePath] stringByAppendingPathComponent:image];
+}
+
++ (void)splitBundleTable:(NSString*)bundleTable intoBundle:(NSString**)pBundleName andTable:(NSString**)pTableName {
+    *pBundleName = nil;
+    *pTableName = nil;
+
+    if (bundleTable == nil || [bundleTable length] == 0) {
+        return;
+    }
+
+    // bundleTable is of the form "bundlename:stringtablename".
+    // If there is no colon, then "bundlename" is assumed.
+    // If there is nothing after the colon, then "bundlename:" is assumed.
+    // If there is nothing before the colon, then ":stringtable" is assumed, and the default bundle is used.
+    NSArray<NSString*> *bundleTableStrings = [bundleTable componentsSeparatedByString:@":"];
+
+    if ([bundleTableStrings count] == 1) {
+        *pBundleName = bundleTableStrings[0];
+    }
+    else if ([bundleTableStrings count] == 2) {
+        *pBundleName = bundleTableStrings[0];
+        *pTableName = bundleTableStrings[1];
+    }
 }
 
 + (NSBundle*)bundleFromName:(NSString*)bundleName {
@@ -339,6 +325,51 @@
     }
 
     return bundle;
+}
+
++ (NSString*)localizeStringForKey:(NSString*)key
+                 withDefaultValue:(NSString*)defaultValue
+                  fromBundleTable:(NSString*)bundleTable
+                    defaultBundle:(NSBundle*)defaultBundle
+                     defaultTable:(NSString*)defaultTable {
+    if (key == nil || [key length] == 0) {
+        return nil;
+    }
+
+    if (defaultValue == nil) {
+        // Not all plist entries will have a default value. In particular,
+        // items that are not intended to be translated.
+        defaultValue = key;
+    }
+
+    NSBundle* bundle = defaultBundle;
+    if (bundle == nil) {
+        bundle = [NSBundle bundleForClass:[self class]];
+    }
+    if (bundle == nil) {
+        bundle = [NSBundle mainBundle];
+    }
+
+    NSString* stringTable = defaultTable;
+    if (stringTable == nil) {
+        stringTable = @"Root";
+    }
+
+    NSString *bundleName = nil, *tableName = nil;
+    [IASKSettingsReader splitBundleTable:bundleTable
+                              intoBundle:&bundleName
+                                andTable:&tableName];
+
+    NSBundle *bundleToUse = [IASKSettingsReader bundleFromName:bundleName];
+    if (bundleToUse != nil) {
+        bundle = bundleToUse;
+    }
+
+    if ([tableName length] > 0) {
+        stringTable = tableName;
+    }
+
+    return [bundle localizedStringForKey:key value:defaultValue table:stringTable];
 }
 
 - (NSString *)platformSuffixForInterfaceIdiom:(UIUserInterfaceIdiom) interfaceIdiom {
