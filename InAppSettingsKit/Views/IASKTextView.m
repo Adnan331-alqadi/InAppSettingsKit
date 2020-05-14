@@ -15,7 +15,87 @@
 //
 
 #import "IASKTextView.h"
+#import "IASKColor.h"
 
-@implementation IASKTextView
+
+
+@implementation IASKTextView {
+	BOOL _shouldDrawPlaceholder;
+}
+
+
+#pragma mark NSObject
+
+- (void)dealloc {
+	[[NSNotificationCenter defaultCenter] removeObserver:self name:UITextViewTextDidChangeNotification object:self];
+}
+
+
+#pragma mark UIView
+
+- (void)configure {
+	[[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(updateShouldDrawPlaceholder) name:UITextViewTextDidChangeNotification object:self];
+	
+	_shouldDrawPlaceholder = NO;
+}
+
+- (id)initWithFrame:(CGRect)frame {
+	if ((self = [super initWithFrame:frame])) {
+		[self configure];
+	}
+	return self;
+}
+
+- (id)initWithCoder:(NSCoder *)aDecoder {
+	if ((self = [super initWithCoder:aDecoder])) {
+		[self configure];
+	}
+	return self;
+}
+
+
+- (void)drawRect:(CGRect)rect {
+	[super drawRect:rect];
+	
+	if (_shouldDrawPlaceholder && self.font) {
+		[_placeholder drawAtPoint:CGPointMake(5.0, 8.0) withAttributes:@{NSFontAttributeName: (UIFont *)self.font, NSForegroundColorAttributeName: IASKColor.iaskPlaceholderColor}];
+	}
+}
+
+
+#pragma mark Setters
+
+- (void)setText:(NSString *)string {
+	[super setText:string];
+	[self updateShouldDrawPlaceholder];
+}
+
+
+- (void)setPlaceholder:(NSString *)string {
+	if ([string isEqual:_placeholder]) {
+		return;
+	}
+	
+	_placeholder = string;
+	
+	self.accessibilityLabel = self.placeholder;
+	[self updateShouldDrawPlaceholder];
+}
+
+- (void)setFrame:(CGRect)frame {
+	super.frame = frame;
+	[self setNeedsDisplay];
+}
+
+#pragma mark Private Methods
+
+- (void)updateShouldDrawPlaceholder {
+	BOOL prev = _shouldDrawPlaceholder;
+	_shouldDrawPlaceholder = self.placeholder && self.text.length == 0;
+	
+	if (prev != _shouldDrawPlaceholder) {
+		[self setNeedsDisplay];
+	}
+}
 
 @end

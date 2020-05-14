@@ -29,6 +29,8 @@
 - (id)initWithSpecifier:(NSDictionary *)specifier
         radioGroupValue:(NSString *)radioGroupValue;
 
+- (void)setMultipleValuesDictValues:(NSArray*)values titles:(NSArray*)titles;
+
 - (void)sortIfNeeded;
 
 - (NSString*)localizedObjectForKey:(NSString*)key;
@@ -45,6 +47,7 @@
 - (NSInteger)multipleValuesCount;
 - (NSArray*)multipleValues;
 - (NSArray*)multipleTitles;
+- (NSArray *)multipleIconNames;
 - (NSString*)file;
 - (id)defaultValue;
 - (id)defaultStringValue;
@@ -60,6 +63,7 @@
 - (UIKeyboardType)keyboardType;
 - (UITextAutocapitalizationType)autocapitalizationType;
 - (UITextAutocorrectionType)autoCorrectionType;
+- (NSRegularExpression*)regex;
 - (NSString*)footerText;
 - (NSString*)footerTextDefault;
 - (Class)viewControllerClass;

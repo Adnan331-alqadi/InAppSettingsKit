@@ -313,6 +313,40 @@
 			<string>ABOUT_TITLE</string>
 		</dict>
 		<dict>
+			<key>Title</key>
+			<string>TextField</string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>RegexValidation</string>
+			<key>Title</key>
+			<string>Regex validation</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>DefaultValue</key>
+			<string>test@example.com</string>
+			<key>IASKTextAlignment</key>
+			<string>IASKUITextAlignmentRight</string>
+			<key>IASKRegex</key>
+			<string>.+\@.+</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>RegexValidation2</string>
+			<key>Title</key>
+			<string>Regex validation 2</string>
+			<key>Type</key>
+			<string>PSTextFieldSpecifier</string>
+			<key>DefaultValue</key>
+			<string>test@example.com</string>
+			<key>IASKTextAlignment</key>
+			<string>IASKUITextAlignmentRight</string>
+			<key>IASKRegex</key>
+			<string>.+\@.+</string>
+		</dict>
+		<dict>
 			<key>FooterText</key>
 			<string>custom segment header view:</string>
 			<key>Title</key>
@@ -485,6 +519,24 @@ with dynamically resizing cell</string>
 			<string>TEXT_FIELD_PWD</string>
 			<key>Key</key>
 			<string>AutoConnectPassword</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>CUSTOM_HEADER_FOOTER</string>
+			<key>Title</key>
+			<string></string>
+			<key>Type</key>
+			<string>PSGroupSpecifier</string>
+		</dict>
+		<dict>
+			<key>Key</key>
+			<string>ButtonDemoAction4</string>
+			<key>Title</key>
+			<string>Button</string>
+			<key>Type</key>
+			<string>IASKButtonSpecifier</string>
+			<key>IASKTextAlignment</key>
+			<string>IASKUITextAlignmentLeft</string>
 		</dict>
 		<dict>
 			<key>Title</key>
