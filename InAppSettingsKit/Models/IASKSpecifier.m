@@ -6,9 +6,9 @@
 //  Luc Vandal, Edovia Inc., http://www.edovia.com
 //  Ortwin Gentz, FutureTap GmbH, http://www.futuretap.com
 //  All rights reserved.
-// 
-//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz, 
-//  as the original authors of this code. You can give credit in a blog post, a tweet or on 
+//
+//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz,
+//  as the original authors of this code. You can give credit in a blog post, a tweet or on
 //  a info page of your app. Also, the original authors appreciate letting them know if you use this code.
 //
 //  This code is licensed under the BSD license that is available at: http://www.opensource.org/licenses/bsd-license.php
@@ -66,6 +66,7 @@
     NSArray *shortTitles = [_specifierDict objectForKey:kIASKShortTitles];
     NSArray *iconNames = [_specifierDict objectForKey:kIASKIconNames];
     NSMutableDictionary *multipleValuesDict = [NSMutableDictionary new];
+
    
     if (values) {
         [multipleValuesDict setObject:values forKey:kIASKValues];
@@ -109,7 +110,8 @@
 
         IASKSettingsReader *strongSettingsReader = self.settingsReader;
         [titles enumerateObjectsUsingBlock:^(id obj, NSUInteger idx, BOOL *stop) {
-            NSString *localizedTitle = [strongSettingsReader titleForId:obj];
+            // TODO: support BundleTable
+            NSString *localizedTitle = [strongSettingsReader titleForId:obj withDefaultValue:nil fromBundleTable:nil];
             [temporaryMappingsForSort addObject:@{titleKey : obj,
                                                   valueKey : values[idx],
                                                   localizedTitleKey : localizedTitle,
@@ -117,7 +119,7 @@
                                                   iconNamesKey : (iconNames[idx] ?: [NSNull null]),
                                                   }];
         }];
-        
+
         NSArray *sortedTemporaryMappings = [temporaryMappingsForSort sortedArrayUsingComparator:^NSComparisonResult(id obj1, id obj2) {
             NSString *localizedTitle1 = obj1[localizedTitleKey];
             NSString *localizedTitle2 = obj2[localizedTitleKey];
@@ -128,7 +130,7 @@
                 return NSOrderedSame;
             }
         }];
-        
+
         NSMutableArray *sortedTitles = [NSMutableArray arrayWithCapacity:sortedTemporaryMappings.count];
         NSMutableArray *sortedShortTitles = [NSMutableArray arrayWithCapacity:sortedTemporaryMappings.count];
         NSMutableArray *sortedValues = [NSMutableArray arrayWithCapacity:sortedTemporaryMappings.count];
@@ -148,16 +150,17 @@
         titles = [sortedTitles copy];
         values = [sortedValues copy];
         shortTitles = [sortedShortTitles copy];
+
         iconNames = [iconNames copy];
         
         if (values) {
             [multipleValuesDict setObject:values forKey:kIASKValues];
         }
-        
+
         if (titles) {
             [multipleValuesDict setObject:titles forKey:kIASKTitles];
         }
-        
+
         if (shortTitles.count) {
             [multipleValuesDict setObject:shortTitles forKey:kIASKShortTitles];
         }
@@ -176,23 +179,58 @@
 
 - (NSString*)localizedObjectForKey:(NSString*)key {
 	IASKSettingsReader *settingsReader = self.settingsReader;
-	return [settingsReader titleForId:[_specifierDict objectForKey:key]];
+
+    // This is kind of a hack to go from something like "FooterText" to "FooterTextDefault".
+    // It will fail for some keys, but nil is okay in those cases okay.
+    NSString* defaultValueKey = [key stringByAppendingString:@"Default"];
+
+    return [settingsReader titleForId:[_specifierDict objectForKey:key] withDefaultValue:[_specifierDict objectForKey:defaultValueKey] fromBundleTable:self.bundleTable];
+}
+
+- (NSString*)bundleTable {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKBundleTable];
+    return res;
 }
 
 - (NSString*)title {
     return [self localizedObjectForKey:kIASKTitle];
 }
 
+- (NSString*)titleDefault {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKTitleDefault];
+    return res;
+}
+
 - (NSString*)subtitle {
 	return [self localizedObjectForKey:kIASKSubtitle];
+}
+
+- (NSString*)subtitleDefault {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKSubtitleDefault];
+    return res;
 }
 
 - (NSString *)placeholder {
     return [self localizedObjectForKey:kIASKPlaceholder];
 }
 
+- (NSString *)placeholderDefault {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKPlaceholderDefault];
+    return res;
+}
+
 - (NSString*)footerText {
     return [self localizedObjectForKey:kIASKFooterText];
+}
+
+- (NSString*)footerTextDefault {
+    // localizedObjectForKey tries to localize, which we don't want here, so we're accessing the specifier dict directly
+    NSString* res = [_specifierDict objectForKey:kIASKFooterTextDefault];
+    return res;
 }
 
 - (Class)viewControllerClass {
@@ -262,7 +300,19 @@
 	}
 	@try {
 		IASKSettingsReader *strongSettingsReader = self.settingsReader;
-		return [strongSettingsReader titleForId:[titles objectAtIndex:keyIndex]];
+
+        NSString *titleId = nil, *titleDefault = nil, *bundleTable = nil;
+
+        if ([[titles objectAtIndex:keyIndex] isKindOfClass:[NSString class]]) {
+            titleId = [titles objectAtIndex:keyIndex];
+        }
+        else {
+            titleId = [[titles objectAtIndex:keyIndex] valueForKey:kIASKTitle];
+            titleDefault = [[titles objectAtIndex:keyIndex] valueForKey:kIASKTitleDefault];
+            bundleTable = [[titles objectAtIndex:keyIndex] valueForKey:kIASKBundleTable];
+        }
+
+        return [strongSettingsReader titleForId:titleId withDefaultValue:titleDefault fromBundleTable:bundleTable];
 	}
 	@catch (NSException * e) {}
 	return nil;
@@ -419,7 +469,7 @@
     NSString *imageName = [_specifierDict objectForKey:kIASKCellImage];
     if( imageName.length == 0 )
         return nil;
-    
+
     return [UIImage imageNamed:imageName];
 }
 

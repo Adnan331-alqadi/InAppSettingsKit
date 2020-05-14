@@ -34,9 +34,13 @@
 - (void)sortIfNeeded;
 
 - (NSString*)localizedObjectForKey:(NSString*)key;
-- (NSString*)title;
+- (NSString *)bundleTable;
+- (NSString *)title;
+- (NSString *)titleDefault;
 - (NSString*)subtitle;
+- (NSString*)subtitleDefault;
 - (NSString*)placeholder;
+- (NSString*)placeholderDefault;
 - (NSString*)key;
 - (NSString*)type;
 - (NSString*)titleForCurrentValue:(id)currentValue;
@@ -61,6 +65,7 @@
 - (UITextAutocorrectionType)autoCorrectionType;
 - (NSRegularExpression*)regex;
 - (NSString*)footerText;
+- (NSString*)footerTextDefault;
 - (Class)viewControllerClass;
 - (SEL)viewControllerSelector;
 - (NSString*)viewControllerStoryBoardFile;

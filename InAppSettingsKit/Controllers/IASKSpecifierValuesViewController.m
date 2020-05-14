@@ -6,9 +6,9 @@
 //  Luc Vandal, Edovia Inc., http://www.edovia.com
 //  Ortwin Gentz, FutureTap GmbH, http://www.futuretap.com
 //  All rights reserved.
-// 
-//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz, 
-//  as the original authors of this code. You can give credit in a blog post, a tweet or on 
+//
+//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz,
+//  as the original authors of this code. You can give credit in a blog post, a tweet or on
 //  a info page of your app. Also, the original authors appreciate letting them know if you use this code.
 //
 //  This code is licensed under the BSD license that is available at: http://www.opensource.org/licenses/bsd-license.php
@@ -92,6 +92,7 @@
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
     UITableViewCell *cell   = [tableView dequeueReusableCellWithIdentifier:kCellValue];
     NSArray *titles         = [_currentSpecifier multipleTitles];
+
     NSArray *iconNames      = [_currentSpecifier multipleIconNames];
 	
     if (!cell) {
@@ -101,7 +102,19 @@
     [_selection updateSelectionInCell:cell indexPath:indexPath];
 
     @try {
-        [[cell textLabel] setText:[self.settingsReader titleForId:[titles objectAtIndex:indexPath.row]]];
+        NSString *titleId = nil, *titleDefault = nil, *bundleTable = nil;
+
+        if ([[titles objectAtIndex:indexPath.row] isKindOfClass:[NSString class]]) {
+            titleId = [titles objectAtIndex:indexPath.row];
+        }
+        else {
+            titleId = [[titles objectAtIndex:indexPath.row] valueForKey:kIASKTitle];
+            titleDefault = [[titles objectAtIndex:indexPath.row] valueForKey:kIASKTitleDefault];
+            bundleTable = [[titles objectAtIndex:indexPath.row] valueForKey:kIASKBundleTable];
+        }
+
+        [[cell textLabel] setText:[self.settingsReader titleForId:titleId withDefaultValue:titleDefault fromBundleTable:bundleTable]];
+
         if ((NSInteger)iconNames.count > indexPath.row) {
             NSString *iconName = iconNames[indexPath.row];
             // This tries to read the image from the main bundle. As this is currently not supported in

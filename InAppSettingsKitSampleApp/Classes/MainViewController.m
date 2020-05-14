@@ -7,9 +7,9 @@
 //  Luc Vandal, Edovia Inc., http://www.edovia.com
 //  Ortwin Gentz, FutureTap GmbH, http://www.futuretap.com
 //  All rights reserved.
-// 
-//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz, 
-//  as the original authors of this code. You can give credit in a blog post, a tweet or on 
+//
+//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz,
+//  as the original authors of this code. You can give credit in a blog post, a tweet or on
 //  a info page of your app. Also, the original authors appreciate letting them know if you use this code.
 //
 //  This code is licensed under the BSD license that is available at: http://www.opensource.org/licenses/bsd-license.php
@@ -67,7 +67,7 @@
     [self dismissCurrentPopover];
 		return;
 	}
-  
+
 	self.appSettingsViewController.showDoneButton = NO;
 	UINavigationController *navController = [[UINavigationController alloc] initWithRootViewController:self.appSettingsViewController];
 	UIPopoverController *popover = [[UIPopoverController alloc] initWithContentViewController:navController];
@@ -96,7 +96,7 @@
 
 	BOOL enabled = [[NSUserDefaults standardUserDefaults] boolForKey:@"AutoConnect"];
 	self.tabAppSettingsViewController.hiddenKeys = enabled ? nil : [NSSet setWithObjects:@"AutoConnectLogin", @"AutoConnectPassword", nil];
-	
+
 	if ([UIDevice currentDevice].userInterfaceIdiom == UIUserInterfaceIdiomPad) {
 		self.navigationItem.rightBarButtonItem = [[UIBarButtonItem alloc] initWithBarButtonSystemItem:UIBarButtonSystemItemAction target:self action:@selector(showSettingsPopover:)];
 	}
@@ -114,7 +114,7 @@
 #pragma mark IASKAppSettingsViewControllerDelegate protocol
 - (void)settingsViewControllerDidEnd:(IASKAppSettingsViewController*)sender {
 	[self dismissViewControllerAnimated:YES completion:nil];
-	
+
 	// your code here to reconfigure the app for changed settings
 }
 
@@ -152,11 +152,11 @@ shouldPresentMailComposeViewController:(MFMailComposeViewController*)mailCompose
 }
 
 - (void)settingsViewController:(id<IASKViewController>)settingsViewController mailComposeController:(MFMailComposeViewController *)controller didFinishWithResult:(MFMailComposeResult)result error:(NSError *)error {
-       
+
     if ( error != nil ) {
         // handle error here
     }
-    
+
     if ( result == MFMailComposeResultSent ) {
         // your code here to handle this result
     }
@@ -255,13 +255,13 @@ shouldPresentMailComposeViewController:(MFMailComposeViewController*)mailCompose
 
 - (UITableViewCell*)tableView:(UITableView*)tableView cellForSpecifier:(IASKSpecifier*)specifier {
 	CustomViewCell *cell = (CustomViewCell*)[tableView dequeueReusableCellWithIdentifier:specifier.key];
-	
+
 	if (!cell) {
-		cell = (CustomViewCell*)[[[NSBundle mainBundle] loadNibNamed:@"CustomViewCell" 
-															   owner:self 
+		cell = (CustomViewCell*)[[[NSBundle mainBundle] loadNibNamed:@"CustomViewCell"
+															   owner:self
 															 options:nil] objectAtIndex:0];
 	}
-	cell.textView.text= [[NSUserDefaults standardUserDefaults] objectForKey:specifier.key] != nil ? 
+	cell.textView.text= [[NSUserDefaults standardUserDefaults] objectForKey:specifier.key] != nil ?
 	 [[NSUserDefaults standardUserDefaults] objectForKey:specifier.key] : [specifier defaultStringValue];
 	cell.textView.delegate = self;
 	[cell setNeedsLayout];
@@ -311,7 +311,7 @@ shouldPresentMailComposeViewController:(MFMailComposeViewController*)mailCompose
 - (void)settingsViewController:(IASKAppSettingsViewController*)sender buttonTappedForSpecifier:(IASKSpecifier*)specifier {
 	if ([specifier.key isEqualToString:@"ButtonDemoAction1"]) {
 		UIAlertController *alert = [UIAlertController alertControllerWithTitle:@"Demo Action 1 called" message:nil preferredStyle:UIAlertControllerStyleAlert];
-		[alert addAction:[UIAlertAction actionWithTitle:NSLocalizedString(@"OK", @"InAppSettingsKit") style:UIAlertActionStyleCancel handler:^(UIAlertAction * action) {}]];
+		[alert addAction:[UIAlertAction actionWithTitle:NSLocalizedStringWithDefaultValue(@"OK_BUTTON", nil, [NSBundle mainBundle], @"OK", @"Alert OK Button. (InAppSettingsKit)") style:UIAlertActionStyleCancel handler:^(UIAlertAction * action) {}]];
 		[sender presentViewController:alert animated:YES completion:nil];
 	} else if ([specifier.key isEqualToString:@"ButtonDemoAction2"]) {
 		NSString *newTitle = [[[NSUserDefaults standardUserDefaults] objectForKey:specifier.key] isEqualToString:@"Logout"] ? @"Login" : @"Logout";

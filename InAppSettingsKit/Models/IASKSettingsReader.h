@@ -6,9 +6,9 @@
 //  Luc Vandal, Edovia Inc., http://www.edovia.com
 //  Ortwin Gentz, FutureTap GmbH, http://www.futuretap.com
 //  All rights reserved.
-// 
-//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz, 
-//  as the original authors of this code. You can give credit in a blog post, a tweet or on 
+//
+//  It is appreciated but not required that you give credit to Luc Vandal and Ortwin Gentz,
+//  as the original authors of this code. You can give credit in a blog post, a tweet or on
 //  a info page of your app. Also, the original authors appreciate letting them know if you use this code.
 //
 //  This code is licensed under the BSD license that is available at: http://www.opensource.org/licenses/bsd-license.php
@@ -20,9 +20,12 @@
 #define kIASKPreferenceSpecifiers             @"PreferenceSpecifiers"
 #define kIASKCellImage                        @"IASKCellImage"
 
+#define kIASKBundleTable                      @"BundleTable"
 #define kIASKType                             @"Type"
 #define kIASKTitle                            @"Title"
+#define kIASKTitleDefault                     @"TitleDefault"
 #define kIASKFooterText                       @"FooterText"
+#define kIASKFooterTextDefault                @"FooterTextDefault"
 #define kIASKKey                              @"Key"
 #define kIASKFile                             @"File"
 #define kIASKDefaultValue                     @"DefaultValue"
@@ -42,7 +45,9 @@
 #define kIASKShortTitles                      @"ShortTitles"
 #define kIASKSupportedUserInterfaceIdioms     @"SupportedUserInterfaceIdioms"
 #define kIASKSubtitle                         @"IASKSubtitle"
+#define kIASKSubtitleDefault                  @"IASKSubtitleDefault"
 #define kIASKPlaceholder                      @"IASKPlaceholder"
+#define kIASKPlaceholderDefault               @"IASKPlaceholderDefault"
 #define kIASKViewControllerClass              @"IASKViewControllerClass"
 #define kIASKViewControllerSelector           @"IASKViewControllerSelector"
 #define kIASKViewControllerStoryBoardFile     @"IASKViewControllerStoryBoardFile"
@@ -123,7 +128,7 @@
 #define kIASKLabelFontSize                    17
 #define kIASKgrayBlueColor                    [UIColor colorWithRed:0.318f green:0.4f blue:0.569f alpha:1.f]
 
-#define kIASKMinimumFontSize                  12.0f
+#define kIASKMinimumFontSize                  6.0f
 
 #ifndef kCFCoreFoundationVersionNumber_iOS_7_0
 #define kCFCoreFoundationVersionNumber_iOS_7_0 843.00
@@ -181,14 +186,14 @@ _Pragma("clang diagnostic pop")
  searches for a settings bundle that contains
  a plist with the specified fileName that must
  be contained in the given bundle
- 
+
  calls initWithFile where applicationBundle is
  set to [NSBundle mainBundle]
  */
 - (id) initWithSettingsFileNamed:(NSString*) fileName
                applicationBundle:(NSBundle*) bundle;
 
-- (id) initWithFile:(NSString*)file;
+- (id) initWithFile:(NSString*)file fromBundle:(NSBundle*)bundle;
 
 - (NSInteger)numberOfSections;
 - (NSInteger)numberOfRowsForSection:(NSInteger)section;
@@ -199,8 +204,18 @@ _Pragma("clang diagnostic pop")
 - (NSString*)titleForSection:(NSInteger)section;
 - (NSString*)keyForSection:(NSInteger)section;
 - (NSString*)footerTextForSection:(NSInteger)section;
-- (NSString*)titleForId:(NSObject*)titleId;
+- (NSString*)titleForId:(NSObject*)titleId withDefaultValue:(NSString*)titleValue fromBundleTable:(NSString*)bundleTable;
 - (NSString*)pathForImageNamed:(NSString*)image;
+
++ (void)splitBundleTable:(NSString*)bundleTable
+              intoBundle:(NSString**)bundleName
+                andTable:(NSString**)tableName;
++ (NSBundle*)bundleFromName:(NSString*)bundleName;
++ (NSString*)localizeStringForKey:(NSString*)key
+                 withDefaultValue:(NSString*)defaultValue
+                  fromBundleTable:(NSString*)bundleTable
+                    defaultBundle:(NSBundle*)defaultBundle
+                     defaultTable:(NSString*)defaultTable;
 
 ///the main application bundle. most often [NSBundle mainBundle]
 @property (nonatomic, readonly) NSBundle      *applicationBundle;
